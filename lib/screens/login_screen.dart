@@ -9,6 +9,21 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String name = "";
   bool changeButton = false;
+
+  final _formKey = GlobalKey<FormState>();
+  moveToHome(BuildContext context) async {
+    if (_formKey.currentState.validate()) {
+      setState(() {
+        changeButton = true;
+      });
+      await Future.delayed(Duration(milliseconds: 1000));
+      await Navigator.pushNamed(context, MyRoute.homeRoute);
+      setState(() {
+        changeButton = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -38,65 +53,74 @@ class _LoginScreenState extends State<LoginScreen> {
                 vertical: 16.0,
                 horizontal: 32.0,
               ),
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: InputDecoration(
-                        hintText: "Username", labelText: "Username"),
-                    onChanged: (value) {
-                      name = value;
-                      setState(() {});
-                    },
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(
-                        hintText: "Password", labelText: "Password"),
-                    obscureText: true,
-                  ),
-                  SizedBox(
-                    height: 40.0,
-                  ),
-                  InkWell(
-                    onTap: () async {
-                      setState(() {
-                        changeButton = true;
-                      });
-                      await Future.delayed(Duration(milliseconds: 500));
-                      Navigator.pushNamed(context, MyRoute.homeRoute);
-                    },
-                    child: AnimatedContainer(
-                      duration: Duration(milliseconds: 500),
-                      width: changeButton ? 40 : 150,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        // shape:
-                        //     changeButton ? BoxShape.circle : BoxShape.rectangle,
-                        color: Colors.deepPurple,
-                        borderRadius: changeButton
-                            ? BorderRadius.circular(40)
-                            : BorderRadius.circular(8),
-                      ),
-                      alignment: Alignment.center,
-                      child: changeButton
-                          ? Icon(
-                              Icons.done,
-                              color: Colors.white,
-                            )
-                          : Text(
-                              "Login",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18),
-                            ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Cannot be empty !";
+                        } else
+                          return null;
+                      },
+                      decoration: InputDecoration(
+                          hintText: "Username", labelText: "Username"),
+                      onChanged: (value) {
+                        name = value;
+                        setState(() {});
+                      },
                     ),
-                  ),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     Navigator.pushNamed(context, MyRoute.homeRoute);
-                  //   },
-                  //   child: Text("Login"),
-                  //   style: TextButton.styleFrom(minimumSize: Size(150, 40)),
-                  // ),
-                ],
+                    TextFormField(
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return "Cannot be empty !";
+                        } else if (value.length < 6) {
+                          return "Atleast 6 characters ! ";
+                        } else
+                          return null;
+                      },
+                      decoration: InputDecoration(
+                          hintText: "Password", labelText: "Password"),
+                      obscureText: true,
+                    ),
+                    SizedBox(
+                      height: 40.0,
+                    ),
+                    Material(
+                      borderRadius: changeButton
+                          ? BorderRadius.circular(40)
+                          : BorderRadius.circular(8),
+                      color: Colors.deepPurple,
+                      child: InkWell(
+                        onTap: () => moveToHome(context),
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 1000),
+                          width: changeButton ? 40 : 150,
+                          height: 40,
+                          alignment: Alignment.center,
+                          child: changeButton
+                              ? Icon(
+                                  Icons.done,
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  "Login",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18),
+                                ),
+                        ),
+                      ),
+                    ),
+                    // ElevatedButton(
+                    //   onPressed: () {
+                    //     Navigator.pushNamed(context, MyRoute.homeRoute);
+                    //   },
+                    //   child: Text("Login"),
+                    //   style: TextButton.styleFrom(minimumSize: Size(150, 40)),
+                    // ),
+                  ],
+                ),
               ),
             ),
           ],
